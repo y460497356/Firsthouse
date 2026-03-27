@@ -33,7 +33,7 @@ jobs:
 
       # 5. 上传生成的文件
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-exe
           path: dist/app.exe  # pyinstaller 默认将生成的文件放在 dist 目录下
