@@ -41,7 +41,10 @@ document.getElementById('sendForm').addEventListener('submit', function(e) {
 
     fetch('/send', {
         method: 'POST',
-        body: new FormData(this)
+        body: JSON.stringify({ content: content }), // 发送 JSON 格式数据
+        headers: {
+            'Content-Type': 'application/json' // 设置请求头
+        }
     })
     .then(response => response.json())
     .then(data => {
@@ -61,7 +64,13 @@ document.getElementById('sendForm').addEventListener('submit', function(e) {
 
             // 自动滚动到底部
             list.scrollTop = list.scrollHeight;
+        } else {
+            alert('发送失败: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('请求出错:', error);
+        alert('网络请求失败，请检查后端是否运行正常。');
     });
 });
 </script>
