@@ -20,6 +20,7 @@ HTML_PAGE = """
 <body>
     <h2>📱 手机局域网通信</h2>
     <p>请在下方输入内容并提交：</p>
+
     
     <!-- 表单提交指向当前地址 -->
     <form action="/" method="POST">
