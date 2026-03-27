@@ -1,8 +1,6 @@
 from flask import Flask, request, render_template_string
 import threading
-
 app = Flask(__name__)
-
 # 简单的 HTML 页面代码（包含在手机端显示的界面）
 # 这是一个包含输入框和提交按钮的简单表单
 HTML_PAGE = """
@@ -31,7 +29,6 @@ HTML_PAGE = """
 </body>
 </html>
 """
-
 # 处理 GET 请求（手机访问页面时）
 @app.route('/', methods=['GET'])
 def index():
