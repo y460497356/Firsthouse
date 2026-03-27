@@ -63,7 +63,6 @@ def get_local_ip():
 if __name__ == '__main__':
     host_ip = get_local_ip()
     port = 5000
-    
     print(f"\n✅ 服务已启动！")
     print(f"🌐 请在手机浏览器输入以下地址访问：")
     print(f"👉  http://{host_ip}:{port}")
