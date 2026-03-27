@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
-
 # 模拟数据库
 messages = ["系统已就绪", "等待消息..."]
 MAX_MESSAGES = 10
