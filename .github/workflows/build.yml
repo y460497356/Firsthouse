@@ -1,38 +1,37 @@
-name: Build Windows EXE
+name: Build Flask App to EXE
 
-# 触发条件：当你推送代码到 master/main 分支时
 on:
   push:
     branches:
-      - master  # 如果你的默认分支是 main，请改为 - main
+      - main  # 如果你的主分支叫 master，请改为 master
+  workflow_dispatch: # 允许手动点击按钮触发
 
 jobs:
   build:
-    runs-on: windows-latest  # 使用 Windows 运行器
+    runs-on: windows-latest
 
     steps:
-      # 1. 检出你的代码
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 设置 Python 环境
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'  # 你可以根据需要更改 Python 版本
+          python-version: '3.10'
 
-      # 3. 安装依赖
       - name: Install dependencies
         run: |
-          pip install pyinstaller flask  # 如果有其他依赖，请一并列出
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      # 4. 执行打包命令
-      - name: Build EXE
+      - name: Build EXE with PyInstaller
         run: |
-          pyinstaller --onefile --console app.py
-      # 5. 上传生成的文件
+          # 核心命令：--add-data 用于包含前端文件夹
+          # 语法是 "源文件夹;目标文件夹"，Windows 下必须用分号 ;
+          pyinstaller --onefile --console --add-data "templates;templates" app.py
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-exe
-          path: dist/app.exe  # pyinstaller 默认将生成的文件放在 dist 目录下
+          name: my-flask-app
+          path: dist/app.exe
