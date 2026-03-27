@@ -9,6 +9,7 @@ MAX_MESSAGES = 10
 def index():
     return render_template('index.html')
 
+
 @app.route('/send', methods=['POST'])
 def send():
     # 尝试从 form 或 json 中获取 content
