@@ -3,7 +3,7 @@ name: Build Flask App to EXE
 on:
   push:
     branches:
-      - main  # 如果你的主分支叫 master，请改为 master
+      - Firsthouse  # 如果你的主分支叫 master，请改为 master
   workflow_dispatch: # 允许手动点击按钮触发
 
 jobs:
