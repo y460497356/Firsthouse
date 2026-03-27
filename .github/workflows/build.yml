@@ -29,8 +29,7 @@ jobs:
       # 4. 执行打包命令
       - name: Build EXE
         run: |
-          pyinstaller --onefile --noconsole app.py
-
+          pyinstaller --onefile --console app.py
       # 5. 上传生成的文件
       - name: Upload artifact
         uses: actions/upload-artifact@v4
