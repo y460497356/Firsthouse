@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
+import time
+import json
 
 app = Flask(__name__)
 
-# 模拟数据库
 messages = ["系统已就绪", "等待消息..."]
 MAX_MESSAGES = 10
 
@@ -10,25 +11,38 @@ MAX_MESSAGES = 10
 def index():
     return render_template('index.html')
 
+# --- 新增：消息推送路由 ---
+@app.route('/stream')
+def stream():
+    def generate():
+        last_count = len(messages)
+        while True:
+            # 每隔1秒检查一下消息列表有没有变化
+            if len(messages) != last_count:
+                # 如果有变化，就把最新的消息列表打包发送出去
+                data = json.dumps({'messages': messages})
+                yield f"data: {data}\n\n"
+                last_count = len(messages)
+            time.sleep(1)
+    return Response(generate(), mimetype='text/event-stream')
+# --- 新增结束 ---
+
 @app.route('/send', methods=['POST'])
 def send():
-    # 修正 1: 使用 request.get_json() 处理 JSON 数据
     data = request.get_json()
     if data:
         content = data.get('content')
     else:
-        # 修正 2: 如果不是 JSON，尝试从表单中获取
         content = request.form.get('content')
 
     if content:
-        print(f"收到消息: {content}")  # 修正 3: 确保终端有输出
+        print(f"收到消息: {content}")
         messages.append(content)
         if len(messages) > MAX_MESSAGES:
             messages.pop(0)
-        # 修正 4: 确保返回的消息列表是可序列化的
         return jsonify({'status': 'success', 'messages': messages})
     else:
         return jsonify({'status': 'error', 'message': '内容不能为空'})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)  # 修正 5: 关闭调试模式
+    app.run(host='0.0.0.0', port=5000, debug=False)
