@@ -31,5 +31,6 @@ def send():
             'message': '内容不能为空'
         }), 400
 
+
 if __name__ == '__main__':
     app.run(debug=True)
