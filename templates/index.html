@@ -34,43 +34,56 @@
 </div>
 
 <script>
-document.getElementById('sendForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // 阻止页面刷新
+// --- 新增：建立实时连接 ---
+const eventSource = new EventSource('/stream');
 
+eventSource.onmessage = function(event) {
+    // 当收到服务器推送的消息时，自动更新页面
+    const data = JSON.parse(event.data);
+    updateMessageList(data.messages);
+};
+
+eventSource.onerror = function() {
+    console.error("实时连接出错，尝试重连...");
+    // SSE 会自动尝试重连，这里可以添加错误提示
+};
+// --- 新增结束 ---
+
+// 将更新列表的逻辑提取出来，方便复用
+function updateMessageList(messages) {
+    const list = document.getElementById('message-list');
+    list.innerHTML = '';
+    messages.forEach(msg => {
+        const item = document.createElement('div');
+        item.className = 'message-item';
+        item.textContent = msg;
+        list.appendChild(item);
+    });
+    list.scrollTop = list.scrollHeight;
+}
+
+document.getElementById('sendForm').addEventListener('submit', function(e) {
+    e.preventDefault();
     const content = document.getElementById('content').value;
 
     fetch('/send', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json' // 修正 1: 设置请求头为 JSON
-        },
-        body: JSON.stringify({ content: content }) // 修正 2: 将数据转换为 JSON 字符串
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content })
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            document.getElementById('content').value = ''; // 清空输入框
-            
-            // 更新列表
-            const list = document.getElementById('message-list');
-            list.innerHTML = ''; // 清空旧内容
-            
-            data.messages.forEach(msg => {
-                const item = document.createElement('div');
-                item.className = 'message-item';
-                item.textContent = msg;
-                list.appendChild(item);
-            });
-
-            // 自动滚动到底部
-            list.scrollTop = list.scrollHeight;
+            document.getElementById('content').value = '';
+            // 发送成功后，也更新一下列表（其实服务器推送也会触发更新）
+            updateMessageList(data.messages);
         } else {
-            alert('发送失败: ' + data.message); // 修正 3: 提示错误信息
+            alert('发送失败: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('发送失败: 网络错误'); // 修正 4: 提示网络错误
+        alert('发送失败: 网络错误');
     });
 });
 </script>
