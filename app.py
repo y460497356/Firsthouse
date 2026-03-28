@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# 模拟数据库 (全局变量)
+# 模拟数据库
 messages = ["系统已就绪", "等待消息..."]
 MAX_MESSAGES = 10
 
@@ -12,24 +12,23 @@ def index():
 
 @app.route('/send', methods=['POST'])
 def send():
-    # 1. 获取数据
-    content = request.form.get('content')
-    
+    # 修正 1: 使用 request.get_json() 处理 JSON 数据
+    data = request.get_json()
+    if data:
+        content = data.get('content')
+    else:
+        # 修正 2: 如果不是 JSON，尝试从表单中获取
+        content = request.form.get('content')
+
     if content:
+        print(f"收到消息: {content}")  # 修正 3: 确保终端有输出
         messages.append(content)
-        # 保持最多 10 条消息
         if len(messages) > MAX_MESSAGES:
             messages.pop(0)
-        
-        # 2. 打印到终端 (确保你能在运行窗口看到)
-        print(f"📱 收到新消息: {content}")
-        print(f"💬 当前消息列表: {messages}")
-        
+        # 修正 4: 确保返回的消息列表是可序列化的
         return jsonify({'status': 'success', 'messages': messages})
     else:
         return jsonify({'status': 'error', 'message': '内容不能为空'})
 
 if __name__ == '__main__':
-    # 3. 关键修改：关闭 debug 模式，并监听 0.0.0.0
-    # threaded=True 确保多用户访问时不会卡死
-    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)  # 修正 5: 关闭调试模式
